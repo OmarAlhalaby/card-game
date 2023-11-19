@@ -43,7 +43,7 @@ const distribute = () => {
   isDistribute.value = true
 
   // Distribute all cards to 4 players in sequence 
-  players = cards.value.reduce((acc: any, card: Card, index) => {
+  players = cards.value.reduce((acc: Array<Card[]>, card, index) => {
     const playerIndex: number = index % 4;
     acc[playerIndex].push(card)
     return acc
@@ -51,58 +51,58 @@ const distribute = () => {
 }
 
 const findTheChamp = () => {
-  let cardsRepetitions: any = {}
-  let index: number = 0
-  let maxRepetition: any = 0
-  let maxRepetitionsArray: Array<number> = []
-  let filteredPlayersCards: any = {}
-  let highestCardsRepetitions: any = {}
-  let obj: any = {}
+  const playerCount = players.length;
+  const maxRepetitionsArray: Array<number> = new Array(playerCount).fill(0)
+  const filteredPlayersCards: Array<Card[]> = new Array(playerCount)
 
   isWinnerSelected.value = true
 
   // Get the highest number of cards with same alphanumeric part 
-  players.forEach((player) => {
+  for (let i = 0; i < playerCount; i++) {
+    const player: Card[] = players[i];
+    const cardsRepetitions: any = {};
+
     // Get the card repetitions for each player
-    cardsRepetitions = player.reduce((a: any, e: any) => {
-      a[e.rank] = ++a[e.rank] || 0
-      return a
-    }, {})
+    for (const card of player) {
+      const rank = card.rank;
+      cardsRepetitions[rank] = (cardsRepetitions[rank] || 0) + 1;
+    }
 
     // Get the highest repetitions only for each player
-    maxRepetition = Object.values(cardsRepetitions).reduce((a: any, b: any) => a < b ? b : a)
-    maxRepetitionsArray.push(maxRepetition + 1)
+    const maxRepetition = Math.max(...Object.values(cardsRepetitions as object));
+    maxRepetitionsArray[i] = maxRepetition
 
     // Get the highest alphanumeric cards with the repetitions for each player
-    highestCardsRepetitions = Object.entries(cardsRepetitions)
-      .filter(([key, value]) => cardsRepetitions[key] === maxRepetition)
+    const highestCardsRepetitions = Object.entries(cardsRepetitions)
+      .filter(([key, value]) => value === maxRepetition)
 
     // Convert to object
-    obj = Object.fromEntries(highestCardsRepetitions)
+    const obj = Object.fromEntries(highestCardsRepetitions)
 
     // Get the highest cards for each player and sort on the suit (symbol) 
-    filteredPlayersCards[index] = player.filter((e: any) => obj[e.rank])
-      .sort((a: any, b: any) => b.id - a.id)
-
-    // Next player
-    index++
-  });
+    filteredPlayersCards[i] = player.filter((e: Card) => obj[e.rank])
+      .sort((a: Card, b: Card) => b.id - a.id)
+  }
 
   // Get the maximum repetitions for all player
   const maxPlayersRepetitions = Math.max(...maxRepetitionsArray);
 
   // Get the player id with the hightest repetitions only
-  const maxIds = maxRepetitionsArray
-    .map((max: any, index: any) => (max === maxPlayersRepetitions ? index : -1))
-    .filter((index: any) => index !== -1);
+  const maxIds: Array<number> = maxRepetitionsArray.reduce((acc: number[], max: number, index: number) => {
+    if (max === maxPlayersRepetitions) {
+      acc.push(index);
+    }
+    return acc;
+  }, [])
 
   // Get the players with the hightest repetitions only
-  const maxPlayers = maxIds.map((index: any) => ({ index, cards: filteredPlayersCards[index] }))
+  const maxPlayers: Array<Winner> = maxIds.map((index: number) => ({ index, cards: filteredPlayersCards[index] }))
 
   // Get the winner
-  winner = maxPlayers.reduce((a: any, b: any) =>
-    a?.cards[0]['id'] < b.cards[0]['id'] ? b : a)
+  winner = maxPlayers.reduce((acc: Winner, element: Winner) =>
+    acc?.cards[0]['id'] < element.cards[0]['id'] ? element : acc)
 
+  // Get the winning set  
   result = winner.cards.slice(0, maxPlayersRepetitions)
 }
 
