@@ -1,0 +1,65 @@
+.deck {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.game {
+    margin-bottom: 33px;
+    display: flex;
+    height: 100px;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-left: 5px;
+}
+
+button:hover {
+    background-color: #0069d9;
+}
+
+button:active {
+    background-color: #005bbf;
+}
+
+button:disabled {
+    background-color: grey;
+    cursor: auto;
+}
+
+.card {
+    width: 106px;
+    height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-suit {
+    font-size: 24px;
+}
+
+.card-rank {
+    font-size: 24px;
+}
